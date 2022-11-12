@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Your Ride</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="css/commonStyle.css">
+  <script src="js/busTicketBookingService.js"></script>
+</head>
+
+<body ng-app="myApp" ng-controller="myCtrl" ng-init="onload();" style="font-family: fangsong;">
+
+  <div class="container-fluid fixed-top py-3" style="background-color: #555;">
+    <div class="row collapse show no-gutters d-flex h-100 position-relative">
+      <div class="col-3 px-0 w-sidebar navbar-collapse collapse d-none d-md-flex">
+        <!-- spacer col -->
+      </div>
+      <div class="col px-3 px-md-0">
+        <!-- toggler -->
+        <a data-toggle="collapse" href="#" data-target=".collapse" role="button" class="text-white p-1">
+          <i class="fa fa-bars fa-lg"></i>
+        </a>
+      </div>
+      <div class="col px-3 px-md-0 donationCls">
+        <span style="text-decoration: none;font-size: 18px;" data-toggle="modal" class="text-white">Book Your
+          Ride</span>
+      </div>
+      <div>
+        <i class="fa fa-sign-out text-white" style="font-size: 20px;cursor: pointer;" ng-click="logout()">Logout</i>
+      </div>
+    </div>
+  </div>
+  <div class="container-fluid px-0">
+    <div class="row collapse show no-gutters d-flex h-100 position-relative">
+      <div class="col-3 p-0 h-100 navbar-collapse collapse d-none d-md-flex sidebar">
+        <!-- fixed sidebar -->
+        <div class="navbar-dark bg-themecolor text-white position-fixed h-100 align-self-start w-sidebar"
+          style="width: 174px;">
+          <img src="logo.png" style="height: 58px;width: 174px;">
+          <a data-toggle="collapse" class="px-1 d-inline d-md-none text-white" href="#" data-target=".collapse"><i
+              class="fa fa-bars"></i></a>
+          <ul class="nav flex-column flex-nowrap text-truncate">
+            <li class="nav-item " id="menuTabId" menuType="MENU">
+              <a class="nav-link active menuCls" href="#" ng-click="switchMenu('MENU','menuTabId')">Route</a>
+            </li>
+            <li class="nav-item " menuType="BILLING" id="billingTabId">
+              <a class="nav-link menuCls" href="#" ng-click="switchMenu('BILLING','billingTabId')">Payment</a>
+            </li>
+            <li class="nav-item " menuType="HISTORY" id="orderHistoryTabId">
+              <a class="nav-link menuCls" href="#" ng-click="switchMenu('HISTORY','orderHistoryTabId')">Booking
+                history</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <!-- Route -->
+      <div class="col-md-11 routeCls" style="margin-left: 200px; margin-top: 56px;" id="routeDivId">
+        <ul>
+          <li id="routeLiId" class="row row-sec clearfix" ng-repeat="data in routeList">
+            <div class="col-2">{{data.busName}}</div>
+            <div class="col-2">{{data.route}}</div>
+            <div class="col-2">{{data.time}}</div>
+            <div class="col-2"><strong>${{data.price}}</strong></div>
+            <div class="col-2"><button ng-click="placeOrder(data)" class="btn btn-info btn-sm" data-toggle="modal"
+                data-target="#placeOrderModalId">Book
+                Now</button>
+            </div>
+          </li>
+        </ul>
+        <!--Place Order Modal -->
+        <div class="modal fade" id="placeOrderModalId">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <!-- Modal Header -->
+              <div class="modal-header bg-info">
+                <h4 class="modal-title text-white">Book Your Ticket</h4>
+                <button type="button" class="close" data-dismiss="modal">×</button>
+              </div>
+              <!-- Modal body -->
+              <div class="modal-body">
+                <form>
+                  <div class="form-row">
+                    <div class="col-md-6 mb-3">
+                      <label for="contactId">Contact no.</label>
+                      <input type="number" class="form-control" id="contactId" placeholder="Enter Contact no." required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label for="emailId">Email</label>
+                      <input type="email" class="form-control" id="userEmailId" value="" placeholder="Enter Email"
+                        required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label>Book Date</label>
+                      <input type="date" class="form-control" id="bookingDateId" value="" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label>Select Seat</label>
+                      <select class="form-control" id="seatId" value="" required>
+                        <option value="">Select Seat</option>
+                        <option value="{{data}}" ng-repeat="data in seatList">{{data}}</option>
+                      </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label for="contactId">Cost</label>
+                      <input type="text" class="form-control" id="costId" value="{{orderDetails.price}}" disabled
+                        required>
+                    </div>
+                  </div>
+                </form>
+              </div>
+              <!-- Modal footer -->
+              <div class="modal-footer">
+                <button type="reset" class="border btn btn-light" data-dismiss="modal">Close</button>
+                <button type="button" class="border btn btn-info" ng-click="addOrder()">Submit</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Participate Div -->
+      <div class="col-md-11 paymentCls" style="margin-left: 200px; margin-top: 56px;" id="biilingId">
+        <table class="table">
+          <thead class="thead-dark">
+            <tr>
+              <th scope="col">Route</th>
+              <th scope="col">Bus Name</th>
+              <th scope="col">Time</th>
+              <th scope="col">Booking Date</th>
+              <th scope="col">Seat no.</th>
+              <th scope="col">Price</th>
+              <th scope="col">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="data in viewOrderTableData">
+              <td scope="col" class="text-black">{{data.route}}</td>
+              <td scope="col" class="text-black">{{data.busName}}</td>
+              <td scope="col" class="text-black">{{data.time}}</td>
+              <td scope="col" class="text-black">{{data.orderDate}}</td>
+              <td scope="col" class="text-black">{{data.seatId}}</td>
+              <td scope="col" class="text-black">{{data.price}}</td>
+              <td scope="col" class="text-black">
+                <button ng-show="data.status == 'pending'" type="button" class="border btn-small btn-info rounded"
+                  ng-click="getOrderData(data)" data-toggle="modal" data-target="#processToPayModalId">Pay Bill</button>
+                <span ng-show="data.status != 'pending'">{{data.status}}</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <!-- process to pay -->
+        <div class="modal fade" id="processToPayModalId">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <!-- Modal Header -->
+              <div class="modal-header bg-info">
+                <h4 class="modal-title text-white">Process to pay</h4>
+                <button type="button" class="close" data-dismiss="modal">×</button>
+              </div>
+              <!-- Modal body -->
+              <div class="modal-body">
+                <form>
+                  <div class="form-row">
+                    <div class="col-md-12 mb-3">
+                      <label for="ammountId">Ammount</label>
+                      <input type="text" class="form-control" id="ammountId" value="" readonly>
+                    </div>
+                    <div class="col-md-12 mb-3">
+                      <label for="paymentModeId">Payment Mode</label>
+                      <select class="form-control" id="paymentModeId">
+                        <option value="">Select</option>
+                        <option value="Cash Payment">Cash</option>
+                        <option value="Card Payment">Card</option>
+                      </select>
+                    </div>
+                  </div>
+                </form>
+              </div>
+              <!-- Modal footer -->
+              <div class="modal-footer">
+                <button type="reset" class="border btn btn-light" data-dismiss="modal">Close</button>
+                <button type="button" class="border btn btn-info" ng-click="payBill()">Submit</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+</body>
+
+</html>
